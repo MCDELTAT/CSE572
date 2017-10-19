@@ -1,7 +1,7 @@
 /* File to create Employee table */
 CREATE TABLE EMP
 (
-    empNo NUMBER(4) PRIMARY KEY NOT NULL UNIQUE,
+    empNo NUMBER(4) PRIMARY KEY NOT NULL,
     fName VARCHAR2(32),
     lName VARCHAR2(32),
     address VARCHAR2(48),

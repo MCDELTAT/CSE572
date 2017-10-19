@@ -1,0 +1,10 @@
+/* File to create the EMP_PROJ table */
+CREATE TABLE EMP_PROJ
+(
+  empNo NUMBER(4) NOT NULL,
+  projNo NUMBER(2) NOT NULL,
+  hourWorked NUMBER(3,1) NOT NULL,
+  CONSTRAINT EMP_PROJ_EMPNO_PROJNO_pk PRIMARY KEY (EMPNO, PROJNO),
+  CONSTRAINT CHK_empNUMBER CHECK (empNo >= 1000), /* Must be 4 digits */
+  CONSTRAINT CHK_projNo CHECK (projNo BETWEEN 10 AND 99)
+);
