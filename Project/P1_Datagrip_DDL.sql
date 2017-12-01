@@ -1,0 +1,227 @@
+create table DEPARTMENT
+(
+	DEPARTMENT_ID NUMBER(2) not null
+		constraint DEPARTMENT_PK
+			primary key,
+	DEPTNAME VARCHAR2(20)
+		constraint UC_DEPARTMENT
+			unique
+)
+/
+
+create table DOCTOR
+(
+	DOCTOR_ID NUMBER(4) not null
+		constraint DOCTOR_ID_PK
+			primary key,
+	ADDRESS_ID NUMBER(5),
+	DEPARTMENT_ID NUMBER(2)
+		constraint DOC_DEPT_DEPT_ID_FK
+			references DEPARTMENT,
+	DFIRST_NAME VARCHAR2(10),
+	DLAST_NAME VARCHAR2(10),
+	DESIGNATION VARCHAR2(15)
+)
+/
+
+create table APPOINTMENT
+(
+	APPOINTMENT_ID NUMBER(2)
+		constraint UC_APPOINTMENT
+			unique,
+	PATIENT_ID NUMBER(5),
+	DOCTOR_ID NUMBER(4)
+		constraint APPT_DOCT_DOCTOR_ID_FK
+			references DOCTOR,
+	DEPARTMENT_ID NUMBER(2)
+		constraint APPT_DEPT_DEPT_ID_FK
+			references DEPARTMENT,
+	DATE_TIME TIMESTAMP(6),
+	REASON VARCHAR2(30),
+	STATUS CHAR
+)
+/
+
+create table MEDICINE
+(
+	MEDICINE_ID NUMBER(10) not null
+		constraint MEDICINE_ID_PK
+			primary key,
+	MEDNAME VARCHAR2(15),
+	QUANTITY NUMBER(3),
+	PRICE NUMBER(8,2)
+)
+/
+
+create table PRESCRIPTION
+(
+	PRESCRIPTION_ID NUMBER(15) not null
+		constraint PRESCRIPTION_PK
+			primary key,
+	MEDICINE_ID NUMBER(10)
+		constraint PRESC_MED_MED_ID_FK
+			references MEDICINE,
+	QUANTITY NUMBER(3)
+)
+/
+
+create table DIAGNOSIS
+(
+	DIAGNOSIS_ID NUMBER(15) not null
+		constraint DIAGNOSIS_PK
+			primary key,
+	APPOINTMENT_ID NUMBER(2)
+		constraint DIAGNOSIS_APPT_APPT_ID_FK
+			references APPOINTMENT (APPOINTMENT_ID),
+	DATE_TIME TIMESTAMP(6),
+	DISEASE VARCHAR2(20)
+)
+/
+
+create table RXDIAGNOSIS_MAPPING
+(
+	PRESCRIPTION_ID NUMBER(15) not null,
+	DIAGNOSIS_ID NUMBER(15) not null,
+	constraint PK_RXDIAGNOSIS_MAPPING
+		primary key (PRESCRIPTION_ID, DIAGNOSIS_ID)
+)
+/
+
+create table MEDRESULT
+(
+	MEDRESULT_ID NUMBER(15) not null
+		constraint MEDICAL_RESULT_PK
+			primary key,
+	EXAMINATION_ID NUMBER(15),
+	RESULT VARCHAR2(30),
+	DATE_TIME TIMESTAMP(6)
+)
+/
+
+create table MEDRESULT_DIAGNOSIS_MAPPING
+(
+	MEDRESULT_ID NUMBER(15) not null,
+	DIAGNOSIS_ID NUMBER(15) not null,
+	constraint PK_MEDRESULT_DIAGNOSIS_MAPPING
+		primary key (MEDRESULT_ID, DIAGNOSIS_ID)
+)
+/
+
+create table EXAMINATION
+(
+	EXAMINATION_ID NUMBER(15) not null
+		constraint EXAMINATION_ID
+			primary key,
+	EXAMNAME VARCHAR2(20) default NULL,
+	EXAMDETAILS VARCHAR2(30)
+)
+/
+
+alter table MEDRESULT
+	add constraint MEDRESULT_EXAM_EXAM_ID_FK
+		foreign key (EXAMINATION_ID) references EXAMINATION
+/
+
+create table ADDRESS
+(
+	ADDRESS_ID NUMBER(5) not null
+		constraint ADDRESS_ID_PK
+			primary key,
+	ADDRESS_TYPE VARCHAR2(10),
+	FULL_ADDRESS VARCHAR2(50) default NULL,
+	ZIP NUMBER(5)
+)
+/
+
+alter table DOCTOR
+	add constraint DOCTOR_ADDRESS_ADDRESS_ID_FK
+		foreign key (ADDRESS_ID) references ADDRESS
+/
+
+create table PATIENT
+(
+	PATIENT_ID NUMBER(5) not null
+		constraint PATIENT_ID_PK
+			primary key,
+	ADDRESS_ID NUMBER(5)
+		constraint PATIENT_ADDRESS_ADDRESS_ID_FK
+			references ADDRESS,
+	PFIRST_NAME VARCHAR2(15),
+	PLAST_NAME VARCHAR2(15),
+	DOB DATE,
+	EMAIL_ADDRESS VARCHAR2(40) default NULL,
+	PHONE_NUMBER VARCHAR2(10),
+	GENDER CHAR,
+	MARITAL_STATUS CHAR(2),
+	INSURANCE_ID NUMBER(9),
+	SSN NUMBER(9)
+)
+/
+
+alter table APPOINTMENT
+	add constraint APPT_PATIENT_PATIENT_ID_FK
+		foreign key (PATIENT_ID) references PATIENT
+/
+
+create table HEALTH_BEHAVIOR_TRACKING
+(
+	HEALTH_BEHAVIOR_TRACKING_ID NUMBER(10) not null
+		constraint HEALTH_BEHAVIOR_TRACKING_ID
+			primary key,
+	PATIENT_ID NUMBER(5)
+		constraint H_B_T_PATIENT_PATIENT_ID_FK
+			references PATIENT,
+	EXERCISE VARCHAR2(30),
+	MEAL VARCHAR2(15),
+	GLUCOSE_LEVEL NUMBER(2,2),
+	BLOOD_PRESSURE NUMBER(3),
+	WEIGHT NUMBER(3),
+	DATE_TIME TIMESTAMP(6)
+)
+/
+
+create table POST
+(
+	POST_ID NUMBER(10) not null
+		constraint POST_ID_PK
+			primary key,
+	POST_CATEGORY_ID NUMBER(10),
+	PATIENT_ID NUMBER(5)
+		constraint POST_PATIENT_PATIENT_ID_FK
+			references PATIENT,
+	HEALTH_BEHAVIOR_TRACKING_ID NUMBER(10)
+		constraint POST_H_B_T_H_B_T_ID_FK
+			references HEALTH_BEHAVIOR_TRACKING,
+	CONTENT VARCHAR2(30),
+	IMAGE BLOB,
+	DATE_TIME TIMESTAMP(6)
+)
+/
+
+create table POST_CATEGORY
+(
+	POST_CATEGORY_ID NUMBER(10) not null
+		constraint POST_CATEGORY_ID_PK
+			primary key,
+	POSTNAME VARCHAR2(15)
+)
+/
+
+alter table POST
+	add constraint POST_PST_CTGRY_PST_CTGRY_ID_FK
+		foreign key (POST_CATEGORY_ID) references POST_CATEGORY
+/
+
+create table COMMENTS
+(
+	COMMENTS_ID NUMBER(10) not null
+		constraint COMMENTS_PK
+			primary key,
+	POST_ID NUMBER(10)
+		constraint COMMENTS_POST_POST_ID_FK
+			references POST,
+	EMAIL VARCHAR2(40) default NULL,
+	CONTENT VARCHAR2(30),
+	DATE_TIME TIMESTAMP(6)
+)
+/
